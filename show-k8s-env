@@ -1,0 +1,5 @@
+#! /bin/bash
+
+currentNS=`kubectl config view --minify -o jsonpath='{..namespace}'`
+printf "\nTop pods in $targetNS namespace\n\n"
+

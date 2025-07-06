@@ -1,0 +1,17 @@
+#!/bin/bash 
+#Description : This script touches the lookup files in the DES nifi containers so nifi
+#              will load them and update the map cache.
+
+. ./lib/k8s-common-util.sh
+. ./cfg/update-des-lookup.cfg # Variables below are defined in this cfg
+
+checkK8sConnection
+
+for container in ${containerList[@]}
+do
+  printf "Touching lookup file $filePath in $container\n"
+  kubectl -c mars-nifi exec $container -- touch $filePath
+  printf "File details are now:\n"
+  kubectl -c mars-nifi exec $node -- ls -lart $filePath
+  printf $actionSeparator
+done

@@ -1,0 +1,35 @@
+#!/bin/bash 
+#Description : This script updates the share files in the nifi containers
+
+source ./k8s-common-util.sh
+
+# Start script execution
+
+getUserConfirmation "Do you want to update nifi's /mnt/data/shared for the $targetNS namespace"
+if userConfirmed == "false" then
+  printf "Exiting\n"
+  exit 0
+fi
+
+
+then
+  printf "oc project\n" #oc project $targetNS >/dev/null
+else
+  exit 0
+fi
+printf $separator
+printf "Updating shares"
+exit 0
+# echo $nodeList Fix this
+printf $separator
+for node in ${nodeList[@]}
+do
+  for file in ${fileList[@]}; do
+    echo "Copying $file from $srcPath to $node:$destPath"
+    kubectl cp -c mars-nifi $srcPath$file $node:$destPath
+    echo "File details at $node:$destPath:"
+    kubectl -c mars-nifi exec $node -- ls -lart $destPath/$file
+    printf $separator
+  done
+done
+

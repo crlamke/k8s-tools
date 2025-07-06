@@ -1,0 +1,14 @@
+#!/bin/bash 
+
+printf "\n---Yellow-Red DES pair---\n"
+printf "Pod Status for mars-cfs-yellow\n"
+oc get pods -n mars-cfs-yellow
+printf "\nPod Status for mars-cfs-red\n"
+oc get pods -n mars-cfs-red
+
+printf "\n---cfs-sandbox DES pair---\n"
+printf "Pod Status for mars-cfs\n"
+oc get pods -n mars-cfs
+printf "\nPod Status for mars-cfs-sandbox\n"
+oc get pods -n mars-cfs-sandbox
+

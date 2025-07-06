@@ -1,0 +1,39 @@
+#!/bin/bash
+#Description: This script copies the files specified in the kcopy.cfg file to/from all containers in a cluster.
+
+copyDirection="FromContainers"
+containerList=()
+filePath=""
+fileList=()
+
+. ./lib/k8s-common-util.sh
+. ./cfg/kcopy.cfg # Variables defined above are overridden by those defined in cfg
+
+checkK8sConnection
+
+if [[ -z "$1" ]]
+then
+  targetNS=`kubectl config view --minify -o jsonpath='{..namespace}'`
+else
+  targetNS=$1
+fi
+
+printf "\nTarget namespace is $targetNS\n"
+dt=`date +"%s"`
+destDir="copied-files-$dt"
+mkdir -p ./$destDir
+printf "\nLogs will be copied to ./$destDir\n"
+for pod in ${podList[@]}
+do
+  mkdir -p ./$destDir/$pod
+  for file in "${filesToGet[@]}"; do
+#    origFileHash=`kubectl exec $targetNS/$pod -- md5sum $logPath/$file`
+#    hash0=$(IFS=" " ; set -- $origFileHash ; echo $1)
+#    printf "Hash of $targetNS/$pod/$logPath/$file = $hash0\n"
+    printf "Attempting cp of $file from $pod ...\n"
+    kubectl cp $targetNS/$pod:$logPath/$file ./$destDir/$pod/$file \
+	    -c mars-nifi > /dev/null 2>&1
+
+#    newFileHash=`kubectl exec mars-nifi-0 -- md5sum /opt/nifi/logs/nifi-app.log`
+  done
+done

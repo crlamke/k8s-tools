@@ -1,0 +1,13 @@
+#! /bin/bash
+#Project Home: https://github.com/crlamke/k8s-tools
+#Copyright   : 2025 Christopher R Lamke
+#License     : MIT - See https://opensource.org/licenses/MIT
+
+if [[ -z "$1" ]] 
+then
+  targetNS=$(kubectl config view --minify -o jsonpath='{..namespace}')
+else
+  targetNS=$1
+fi
+printf "\nTop pods in %s namespace\n\n" "$targetNS"
+kubectl top pod --namespace="$targetNS"

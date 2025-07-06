@@ -1,0 +1,48 @@
+#!/bin/bash 
+#Description : This script updates the schema files in the nifi containers
+#              so nifi can perform schema validation.
+
+targetNS="mars-cfs-red"
+nodeList=("mars-nifi-0" "mars-nifi-1" "mars-nifi-2")
+srcPath="/home/clamke/dpaas-testbed-setup/config-files/"
+destPath="/mnt/data/shared/schemas/"
+fileList=("devu_30_sipr_H2L.xsd" "devu_30_sipr_L2H.xsd")
+
+separator="\n\n"
+
+# Trap ctrl + c 
+trap ctrl_c INT
+function ctrl_c() 
+{
+  printf "\n\nctrl-c received. Exiting\n"
+  exit
+}
+
+
+###
+# Start script execution
+###
+printf $separator
+
+printf "Targeting $targetNS namespace\n"
+read -p "Continue? Y/N " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  oc project $targetNS >/dev/null
+else
+  exit 0
+fi
+printf $separator
+# echo $nodeList Fix this
+printf $separator
+for node in ${nodeList[@]}
+do
+  for file in ${fileList[@]}; do
+  echo "Copying $file from $srcPath to $node:$destPath"
+  kubectl cp -c mars-nifi $srcPath$file $node:$destPath
+  echo "File details at $node:$destPath:"
+  kubectl -c mars-nifi exec $node -- ls -lart $destPath/$file
+  printf $separator
+  done
+done

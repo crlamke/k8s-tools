@@ -1,0 +1,13 @@
+#! /bin/bash
+
+if [[ -z "$1" ]] 
+then
+  targetNS=`kubectl config view --minify -o jsonpath='{..namespace}'`
+else
+  targetNS=$1
+fi
+
+printf "\nNamespace: $targetNS\n\n"
+
+kubectl get pod -o="custom-columns=NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name"
+

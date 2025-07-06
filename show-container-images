@@ -1,0 +1,10 @@
+#! /bin/bash
+
+if [[ -z "$1" ]] 
+then
+  targetNS=`kubectl config view --minify -o jsonpath='{..namespace}'`
+else
+  targetNS=$1
+fi
+printf "\nImages for containers in $targetNS namespace\n\n"
+kubectl get pods --namespace=$targetNS -o jsonpath='{range .items[*]}{"\n"}{.metadata.name}{":\t"}{range .spec.containers[*]}{.image}{", "}{end}{end}' | sort 
